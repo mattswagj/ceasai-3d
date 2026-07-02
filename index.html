@@ -893,7 +893,7 @@ body.cursor-on .cursor-dot, body.cursor-on .cursor-ring{display:block}
       mkPanel(0xf5c451, 3, 4, 8, new THREE.Vector3(-6, 0, 2));    // gold wash
       mkPanel(0x35405c, 1.6, 8, 3, new THREE.Vector3(0, -6, -4)); // cool floor bounce
       mkPanel(0xffffff, 2.2, 2, 2, new THREE.Vector3(0, 2, -7));  // back kick
-      var envRT = pmrem.fromScene(envScene, 0.05);
+      var envRT = pmrem.fromScene(envScene, 0.035);
       scene.environment = envRT.texture;
       pmrem.dispose();
     } catch (e) { /* env map optional — lights still carry the look */ }
