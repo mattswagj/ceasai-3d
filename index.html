@@ -1064,16 +1064,16 @@ body.cursor-on .cursor-dot, body.cursor-on .cursor-ring{display:block}
           '  vec2 uv = vUv;',
           '  vec2 ctr = vec2(0.5 + uMouse.x*0.06, 0.44 - uMouse.y*0.05);',
           '  float dd = distance(uv, ctr);',
-          '  float glow = smoothstep(0.62, 0.0, dd);',
+          '  float glow = smoothstep(0.5, 0.0, dd);',
           '  float breathe = 0.72 + 0.28*sin(uTime*0.5);',
           '  float n = noise(uv*3.0 + uTime*0.03);',
           '  float n2 = noise(uv*7.0 - uTime*0.02);',
           '  vec3 col = uDeep;',
-          '  col += uGold * glow * 0.16 * breathe;',
-          '  col += uGold * pow(glow, 3.0) * 0.10;',
+          '  col += uGold * glow * 0.085 * breathe;',
+          '  col += uGold * pow(glow, 3.0) * 0.06;',
           '  col += (n*0.5 + n2*0.5 - 0.5) * 0.012;',
           '  float vig = smoothstep(1.15, 0.35, length(uv-0.5));',
-          '  col *= (0.6 + 0.4*vig);',
+          '  col *= (0.45 + 0.45*vig);',
           '  gl_FragColor = vec4(col, 1.0);',
           '}'
         ].join('\n')
@@ -1095,9 +1095,9 @@ body.cursor-on .cursor-dot, body.cursor-on .cursor-ring{display:block}
         composer.addPass(new THREE.RenderPass(scene, camera));
         bloomPass = new THREE.UnrealBloomPass(
           new THREE.Vector2(window.innerWidth, window.innerHeight),
-          isMobile ? 0.55 : 0.80,
-          0.72,
-          0.72
+          isMobile ? 0.42 : 0.62,
+          0.6,
+          0.80
         );
         composer.addPass(bloomPass);
         if (typeof THREE.GammaCorrectionShader !== 'undefined') {
