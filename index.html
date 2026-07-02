@@ -713,6 +713,15 @@ body.cursor-on .cursor-dot, body.cursor-on .cursor-ring{display:block}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<!-- Three.js r128 post-processing (global THREE build) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/GammaCorrectionShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/MaskPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 
 <script>
 /* ============================================================
@@ -912,6 +921,20 @@ body.cursor-on .cursor-dot, body.cursor-on .cursor-ring{display:block}
       color: 0xC79A3B, metalness: 1.0, roughness: 0.24,
       emissive: 0x6b4a10, emissiveIntensity: 0.22, flatShading: true
     });
+    /* custom GLSL fresnel rim - gold edge glow that the bloom pass ignites */
+    shardMat.onBeforeCompile = function (shader) {
+      shader.uniforms.uRimColor = { value: new THREE.Color(0xffcf7a) };
+      shader.uniforms.uRimPower = { value: 2.4 };
+      shader.uniforms.uRimStrength = { value: 0.9 };
+      shader.vertexShader = 'varying vec3 vRimN;\nvarying vec3 vRimV;\n' + shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        '#include <begin_vertex>\n  vec4 vRimW = modelMatrix * vec4(transformed, 1.0);\n  vRimN = normalize(mat3(modelMatrix) * objectNormal);\n  vRimV = normalize(cameraPosition - vRimW.xyz);'
+      );
+      shader.fragmentShader = 'uniform vec3 uRimColor;\nuniform float uRimPower;\nuniform float uRimStrength;\nvarying vec3 vRimN;\nvarying vec3 vRimV;\n' + shader.fragmentShader.replace(
+        '#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\n  float rimF = pow(1.0 - clamp(dot(normalize(vRimN), normalize(vRimV)), 0.0, 1.0), uRimPower);\n  totalEmissiveRadiance += uRimColor * rimF * uRimStrength;'
+      );
+    };
     var shards = [];
     var vA = new THREE.Vector3(), vB = new THREE.Vector3(), vC = new THREE.Vector3();
     for (var f = 0; f < posAttr.count; f += 3) {
@@ -1017,6 +1040,72 @@ body.cursor-on .cursor-dot, body.cursor-on .cursor-ring{display:block}
       }, { passive: true });
     }
 
+    /* --- animated GLSL fog / gradient backdrop (custom shader) --- */
+    var bgMat = null;
+    try {
+      bgMat = new THREE.ShaderMaterial({
+        depthWrite: false, depthTest: false,
+        uniforms: {
+          uTime: { value: 0 },
+          uMouse: { value: new THREE.Vector2(0, 0) },
+          uGold: { value: new THREE.Color(0xf5c451) },
+          uDeep: { value: new THREE.Color(0x05070D) }
+        },
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+        fragmentShader: [
+          'precision highp float;',
+          'varying vec2 vUv;',
+          'uniform float uTime; uniform vec2 uMouse; uniform vec3 uGold; uniform vec3 uDeep;',
+          'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }',
+          'float noise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); f=f*f*(3.0-2.0*f);',
+          '  float a=hash(i), b=hash(i+vec2(1.0,0.0)), c=hash(i+vec2(0.0,1.0)), d=hash(i+vec2(1.0,1.0));',
+          '  return mix(mix(a,b,f.x), mix(c,d,f.x), f.y); }',
+          'void main(){',
+          '  vec2 uv = vUv;',
+          '  vec2 ctr = vec2(0.5 + uMouse.x*0.06, 0.44 - uMouse.y*0.05);',
+          '  float dd = distance(uv, ctr);',
+          '  float glow = smoothstep(0.62, 0.0, dd);',
+          '  float breathe = 0.72 + 0.28*sin(uTime*0.5);',
+          '  float n = noise(uv*3.0 + uTime*0.03);',
+          '  float n2 = noise(uv*7.0 - uTime*0.02);',
+          '  vec3 col = uDeep;',
+          '  col += uGold * glow * 0.16 * breathe;',
+          '  col += uGold * pow(glow, 3.0) * 0.10;',
+          '  col += (n*0.5 + n2*0.5 - 0.5) * 0.012;',
+          '  float vig = smoothstep(1.15, 0.35, length(uv-0.5));',
+          '  col *= (0.6 + 0.4*vig);',
+          '  gl_FragColor = vec4(col, 1.0);',
+          '}'
+        ].join('\n')
+      });
+      var bgMesh = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), bgMat);
+      bgMesh.position.set(0, 0, -14);
+      bgMesh.renderOrder = -1;
+      scene.add(bgMesh);
+    } catch (e) { bgMat = null; }
+
+    /* --- post-processing: real cinematic bloom via EffectComposer + UnrealBloomPass --- */
+    var composer = null, bloomPass = null;
+    if (typeof THREE.EffectComposer === 'function' && typeof THREE.UnrealBloomPass === 'function') {
+      try {
+        renderer.setClearColor(0x05070D, 1);
+        composer = new THREE.EffectComposer(renderer);
+        composer.setPixelRatio(DPR);
+        composer.setSize(window.innerWidth, window.innerHeight);
+        composer.addPass(new THREE.RenderPass(scene, camera));
+        bloomPass = new THREE.UnrealBloomPass(
+          new THREE.Vector2(window.innerWidth, window.innerHeight),
+          isMobile ? 0.55 : 0.80,
+          0.72,
+          0.72
+        );
+        composer.addPass(bloomPass);
+        if (typeof THREE.GammaCorrectionShader !== 'undefined') {
+          composer.addPass(new THREE.ShaderPass(THREE.GammaCorrectionShader));
+        }
+      } catch (e) { composer = null; bloomPass = null; }
+    }
+
     /* --- render loop --- */
     var clock = new THREE.Clock();
     var q = new THREE.Quaternion();
@@ -1050,7 +1139,7 @@ body.cursor-on .cursor-dot, body.cursor-on .cursor-ring{display:block}
       heartMesh.scale.set(hs, hs, hs);
       heartHalo.scale.set(hs * 1.35, hs * 1.35, hs * 1.35);
       heart.intensity = 0.5 + eEase * 3.2 + Math.sin(t * 2.1) * 0.12;
-      glow.material.opacity = 0.5 + eEase * 0.4 + Math.sin(t * 1.4) * 0.05;
+      glow.material.opacity = 0.32 + eEase * 0.30 + Math.sin(t * 1.4) * 0.04;
       glow.scale.setScalar(5.4 + eEase * 2.4);
 
       // slow royal rotation
@@ -1075,7 +1164,8 @@ body.cursor-on .cursor-dot, body.cursor-on .cursor-ring{display:block}
       camera.position.z = baseCamZ + eEase * 1.15;
       camera.lookAt(0, 0, 0);
 
-      renderer.render(scene, camera);
+      if (bgMat) { bgMat.uniforms.uTime.value = t * (reduceMotion ? 0.12 : 1.0); bgMat.uniforms.uMouse.value.set(mx, my); }
+      if (composer) { composer.render(); } else { renderer.render(scene, camera); }
     }
     frame();
 
@@ -1087,6 +1177,8 @@ body.cursor-on .cursor-dot, body.cursor-on .cursor-ring{display:block}
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        if (composer) composer.setSize(window.innerWidth, window.innerHeight);
+        if (bloomPass) bloomPass.setSize(window.innerWidth, window.innerHeight);
       }, 120);
     });
     document.addEventListener('visibilitychange', function () {
