@@ -158,7 +158,13 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
   background:radial-gradient(circle at 50% 44%, rgba(201,162,39,.2), transparent 30%),radial-gradient(circle at 50% 44%, rgba(201,162,39,.06), transparent 52%)}
 .hero-fallback.is-on{display:block}
 .hero-fallback img{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:min(46vw,360px);opacity:.96;filter:drop-shadow(0 20px 60px rgba(0,0,0,.6))}
-.hero-copy{position:relative;z-index:5;text-align:center;padding:0 24px;max-width:1120px}
+.hero-copy{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:clamp(92px,13vh,140px) 24px clamp(74px,11vh,116px)}
+.hero-top,.hero-bottom{width:100%;max-width:1180px;position:relative}
+.hero-top::before{content:"";position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);width:min(120vw,1000px);height:60vh;pointer-events:none;z-index:-1;background:radial-gradient(ellipse 60% 55% at 50% 50%, rgba(5,5,6,.72), transparent 70%)}
+.hero-bottom::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(120vw,820px);height:44vh;pointer-events:none;z-index:-1;background:radial-gradient(ellipse 60% 60% at 50% 55%, rgba(5,5,6,.68), transparent 72%)}
+.hero-glow{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);z-index:0;pointer-events:none;width:min(96vw,900px);height:min(96vw,900px);border-radius:50%;
+  background:radial-gradient(circle, rgba(201,162,39,.16), rgba(201,162,39,.05) 42%, transparent 66%);
+  filter:blur(8px);opacity:.7;will-change:opacity,transform}
 .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;color:var(--gold);margin-bottom:26px;display:flex;align-items:center;justify-content:center;gap:16px}
 .eyebrow::before,.eyebrow::after{content:"";height:1px;width:34px;background:linear-gradient(90deg,transparent,var(--line))}
 .eyebrow::after{background:linear-gradient(90deg,var(--line),transparent)}
@@ -258,6 +264,15 @@ body.paused .marquee-track{animation-play-state:paused}
 .marquee-item:hover{color:var(--ink)}
 .marquee-item i{width:8px;height:8px;border-radius:50%;background:var(--gold);opacity:.7;flex:none;font-style:normal;box-shadow:0 0 10px rgba(201,162,39,.6)}
 .industries-note{margin-top:32px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.4em;text-indent:.4em;text-transform:uppercase;color:var(--gold)}
+/* Horizontal scroll-snap gallery (buttery product-style scroll) */
+.hsnap{margin-top:clamp(46px,7vh,72px);display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px clamp(20px,5vw,72px) 26px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.hsnap::-webkit-scrollbar{display:none}
+.hcard{scroll-snap-align:center;flex:0 0 auto;width:min(80vw,340px);min-height:236px;border:1px solid var(--line);border-radius:20px;padding:28px 30px;background:linear-gradient(180deg,rgba(22,22,24,.55),rgba(8,8,10,.55));display:flex;flex-direction:column;justify-content:space-between;gap:20px;transition:border-color .45s,transform .55s var(--ease),box-shadow .45s}
+.hcard:hover{border-color:var(--gold);transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.hcard .hn{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
+.hcard .ht{font-family:var(--disp);font-weight:600;font-size:clamp(1.3rem,2.4vw,1.85rem);color:var(--ink);line-height:1.16}
+.hcard .hd{font-size:.9rem;color:var(--muted);line-height:1.6}
+.hsnap-hint{margin-top:6px;text-align:center;font-family:var(--mono);font-size:9px;letter-spacing:.34em;text-transform:uppercase;color:var(--faint)}
 
 /* Proof */
 .proof{background:radial-gradient(ellipse 80% 60% at 50% 50%, rgba(201,162,39,.05), transparent 70%)}
@@ -311,6 +326,7 @@ body.paused .marquee-track{animation-play-state:paused}
 
 <!-- Backdrop -->
 <div class="backdrop" aria-hidden="true"></div>
+<div class="hero-glow" id="heroGlow" aria-hidden="true"></div>
 <div class="hexgrid" id="hexgrid" aria-hidden="true"></div>
 
 <!-- Loader -->
@@ -379,12 +395,16 @@ body.paused .marquee-track{animation-play-state:paused}
     <div class="hero-fallback" id="heroFallback" aria-hidden="true"><img src="CeasAI_Logo.jpeg" alt="CeasAI logo"></div>
     <section class="hero-stage" id="heroStage">
       <div class="hero-copy" id="heroCopy">
-        <p class="eyebrow" id="heroEyebrow">Custom AI Solutions</p>
-        <h1 class="hero-h1" id="heroH1">Your whole business, in <span class="gold-i">one simple app.</span><span class="hero-ghost" aria-hidden="true">Your whole business, in one simple app.</span></h1>
-        <p class="hero-sub" id="heroSub">Custom agentic AI — a ready-made CRM and booking page. A simpler, smarter alternative to big, complicated software.</p>
-        <div class="hero-ctas" id="heroCtas">
-          <a class="btn btn-gold magnetic" href="#contact" data-scroll>Get Started <span class="arr">→</span></a>
-          <a class="btn btn-ghost magnetic" href="#approach" data-scroll>Begin the tour</a>
+        <div class="hero-top">
+          <p class="eyebrow" id="heroEyebrow">Custom AI Solutions</p>
+          <h1 class="hero-h1" id="heroH1">Your whole business, in <span class="gold-i">one simple app.</span><span class="hero-ghost" aria-hidden="true">Your whole business, in one simple app.</span></h1>
+        </div>
+        <div class="hero-bottom">
+          <p class="hero-sub" id="heroSub">Custom agentic AI — a ready-made CRM and booking page. A simpler, smarter alternative to big, complicated software.</p>
+          <div class="hero-ctas" id="heroCtas">
+            <a class="btn btn-gold magnetic" href="#contact" data-scroll>Get Started <span class="arr">→</span></a>
+            <a class="btn btn-ghost magnetic" href="#approach" data-scroll>Begin the tour</a>
+          </div>
         </div>
       </div>
       <div class="hero-mid" id="heroMid" aria-hidden="true">
@@ -454,17 +474,16 @@ body.paused .marquee-track{animation-play-state:paused}
         <p class="sec-eyebrow" data-reveal><span class="n">05</span> — Industries</p>
         <h2 class="display" data-split>Built for the ones <span class="gold-i">who build their day</span> by hand.</h2>
       </div>
-      <div class="marquee" aria-label="Industries we serve">
-        <div class="marquee-track" id="marqueeTrack">
-          <span class="marquee-item"><i></i>Personal Trainers &amp; Gyms</span>
-          <span class="marquee-item"><i></i>Salons &amp; Barbershops</span>
-          <span class="marquee-item"><i></i>Tutors &amp; Coaches</span>
-          <span class="marquee-item"><i></i>Cleaning &amp; Home Services</span>
-          <span class="marquee-item"><i></i>Landscapers</span>
-          <span class="marquee-item"><i></i>Photographers</span>
-          <span class="marquee-item"><i></i>Clinics &amp; Wellness Studios</span>
-        </div>
+      <div class="hsnap" aria-label="Industries we serve">
+        <div class="hcard"><span class="hn">01 · Fitness</span><h3 class="ht">Personal Trainers &amp; Gyms</h3><p class="hd">Fill the calendar, follow up with every lead, keep clients on program — automatically.</p></div>
+        <div class="hcard"><span class="hn">02 · Grooming</span><h3 class="ht">Salons &amp; Barbershops</h3><p class="hd">Chair time booked in one message; no-shows nudged before they cost you.</p></div>
+        <div class="hcard"><span class="hn">03 · Education</span><h3 class="ht">Tutors &amp; Coaches</h3><p class="hd">Turn enquiries into scheduled sessions while you're mid-lesson.</p></div>
+        <div class="hcard"><span class="hn">04 · Home</span><h3 class="ht">Cleaning &amp; Home Services</h3><p class="hd">Quote, qualify and route jobs the moment a request lands.</p></div>
+        <div class="hcard"><span class="hn">05 · Outdoor</span><h3 class="ht">Landscapers</h3><p class="hd">Seasonal follow-ups and rebooking, handled without lifting a finger.</p></div>
+        <div class="hcard"><span class="hn">06 · Creative</span><h3 class="ht">Photographers</h3><p class="hd">From first message to booked shoot — captured while they're still excited.</p></div>
+        <div class="hcard"><span class="hn">07 · Wellness</span><h3 class="ht">Clinics &amp; Wellness Studios</h3><p class="hd">Intake, reminders and rebooking that run themselves.</p></div>
       </div>
+      <p class="hsnap-hint" aria-hidden="true">← Drag / scroll →</p>
       <p class="industries-note" data-reveal>Fitness · Sports · Hospitality · &amp; Beyond</p>
     </section>
 
@@ -528,6 +547,7 @@ body.paused .marquee-track{animation-play-state:paused}
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
@@ -745,12 +765,33 @@ body.paused .marquee-track{animation-play-state:paused}
       pmrem.dispose();
     } catch (e) {}
 
+    // Upgrade to a real Poly Haven studio HDRI for true metal reflections (procedural env stays as fallback)
+    try {
+      if (THREE.RGBELoader && !isMobile) {
+        var pmrem2 = new THREE.PMREMGenerator(renderer);
+        pmrem2.compileEquirectangularShader();
+        new THREE.RGBELoader().setDataType(THREE.HalfFloatType)
+          .load('https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/studio_small_08_1k.hdr',
+            function (hdr) {
+              try {
+                var envMap = pmrem2.fromEquirectangular(hdr).texture;
+                scene.environment = envMap;
+                hdr.dispose(); pmrem2.dispose();
+              } catch (e2) {}
+            },
+            undefined,
+            function () { try { pmrem2.dispose(); } catch (e3) {} });
+      }
+    } catch (e) {}
+
     scene.add(new THREE.AmbientLight(0x20180a, 1.1));
     var key = new THREE.DirectionalLight(0xffe3b0, 2.4); key.position.set(2.5, 5, 5); scene.add(key);
     var rim = new THREE.DirectionalLight(0x5a6a8a, 0.8); rim.position.set(-5, -2, -4); scene.add(rim);
     var eyeLight = new THREE.PointLight(0x22b7ff, 0.0, 8, 2); eyeLight.position.set(0, 0.1, 0.8); scene.add(eyeLight);
+    // Scroll-reactive gold rim light (DRIP-style PointLight glow tied to scroll position)
+    var scrollLight = new THREE.PointLight(0xF2D680, 0.6, 14, 2); scrollLight.position.set(0, 2.4, 2.2); scene.add(scrollLight);
 
-    var root = new THREE.Group(); scene.add(root);
+    var root = new THREE.Group(); root.scale.setScalar(0.8); scene.add(root);
     var badge = new THREE.Group(); root.add(badge);
 
     function hexRingGeo(outerR, innerR, depth) {
@@ -887,7 +928,7 @@ body.paused .marquee-track{animation-play-state:paused}
       });
       window.addEventListener('pointermove', function (e) {
         if (!dragging) return;
-        var dx = e.clientX - lastX; lastX = e.clientX; dragVel += dx * 0.00045;
+        var dx = e.clientX - lastX; lastX = e.clientX; dragVel += dx * 0.0011;
       }, { passive: true });
       window.addEventListener('pointerup', function () { dragging = false; if (cRing) cRing.classList.remove('is-drag'); });
     }
@@ -895,6 +936,7 @@ body.paused .marquee-track{animation-play-state:paused}
     var blink = 1, nextBlink = 2.5 + Math.random() * 3;
     var clock = new THREE.Clock();
     var frames = 0, fpsT = 0, fpsEl = document.getElementById('hudFps');
+    var heroGlowEl = document.getElementById('heroGlow');
 
     function frame() {
       requestAnimationFrame(frame);
@@ -922,11 +964,20 @@ body.paused .marquee-track{animation-play-state:paused}
         var gs = (0.5 + Math.sin(t * 2.2) * 0.06) * (0.4 + asmE * 0.6);
         glowL.scale.set(gs, gs * blink, 1); glowR.scale.set(gs, gs * blink, 1);
         glowL.position.x = eL.x + scan; glowR.position.x = eR.x + scan;
-        eyeLight.intensity = (0.6 + Math.sin(t * 2.2) * 0.2) * asmE;
+        eyeLight.intensity = (0.6 + Math.sin(t * 2.2) * 0.2) * asmE * (1 + p * 1.4);
       } else {
         eyeLm.scale.set(0.9, 0.9, 1); eyeRm.scale.set(0.9, 0.9, 1);
       }
       eyeMat.color.setRGB(0.75, 0.94 + Math.sin(t * 2.2) * 0.05, 1.0);
+
+      // scroll-reactive gold rim glow: intensity + position track scroll progress
+      scrollLight.intensity = 0.5 + p * 3.4 + partE * 1.2;
+      scrollLight.position.x = Math.sin(p * Math.PI * 2) * 2.6;
+      scrollLight.position.y = 2.4 - p * 3.2;
+      if (heroGlowEl) {
+        heroGlowEl.style.opacity = (0.55 + partE * 0.5).toFixed(3);
+        heroGlowEl.style.transform = 'translate(-50%,-50%) scale(' + (1 + p * 0.5).toFixed(3) + ')';
+      }
 
       if (animate) {
         dragVel *= 0.94; dragAngle += dragVel;
@@ -1027,6 +1078,7 @@ body.paused .marquee-track{animation-play-state:paused}
     gsap.from('.contact h2', { scale: 0.94, opacity: 0.4, duration: 1.4, ease: 'power3.out', scrollTrigger: { trigger: '.contact', start: 'top 75%' } });
     gsap.to('#hexgrid', { yPercent: 12, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 1.5 } });
 
+
     var idxLinks = Array.prototype.slice.call(document.querySelectorAll('.index a'));
     idxLinks.forEach(function (a) {
       var sel = a.getAttribute('href');
@@ -1060,7 +1112,7 @@ body.paused .marquee-track{animation-play-state:paused}
       ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
       requestAnimationFrame(cursorLoop);
     })();
-    document.querySelectorAll('a, button, .build-row, .protiq-feats span, .chip, .index a').forEach(function (el) {
+    document.querySelectorAll('a, button, .build-row, .protiq-feats span, .chip, .index a, .hcard').forEach(function (el) {
       el.addEventListener('mouseenter', function () { ring.classList.add('is-active'); });
       el.addEventListener('mouseleave', function () { ring.classList.remove('is-active'); });
     });
