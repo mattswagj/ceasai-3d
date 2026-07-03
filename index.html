@@ -791,7 +791,7 @@ body.paused .marquee-track{animation-play-state:paused}
     // Scroll-reactive gold rim light (DRIP-style PointLight glow tied to scroll position)
     var scrollLight = new THREE.PointLight(0xF2D680, 0.6, 14, 2); scrollLight.position.set(0, 2.4, 2.2); scene.add(scrollLight);
 
-    var root = new THREE.Group(); root.scale.setScalar(0.8); scene.add(root);
+    var root = new THREE.Group(); root.scale.setScalar(isMobile ? 0.62 : 0.68); scene.add(root);
     var badge = new THREE.Group(); root.add(badge);
 
     function hexRingGeo(outerR, innerR, depth) {
@@ -831,7 +831,7 @@ body.paused .marquee-track{animation-play-state:paused}
     }
 
     var Rdisc = 0.94;
-    var faceMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 0.55, roughness: 0.5, emissive: 0x161616, emissiveIntensity: 0.2, transparent: true });
+    var faceMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 0.12, roughness: 0.62, emissive: 0x161616, emissiveIntensity: 0.2, transparent: true });
     var faceDisc = new THREE.Mesh(new THREE.CircleGeometry(Rdisc, 64), faceMat);
     faceDisc.position.z = 0.10; badge.add(faceDisc);
     var bezel = new THREE.Mesh(new THREE.TorusGeometry(Rdisc + 0.02, 0.05, 16, 80), silverMat);
@@ -843,7 +843,8 @@ body.paused .marquee-track{animation-play-state:paused}
     texLoader.load('logo_face_disc.png', function (tex) {
       tex.encoding = THREE.sRGBEncoding;
       tex.minFilter = THREE.LinearFilter; tex.magFilter = THREE.LinearFilter; tex.generateMipmaps = false;
-      faceMat.map = tex; faceMat.color.set(0xffffff); faceMat.needsUpdate = true;
+      faceMat.map = tex; faceMat.emissiveMap = tex; faceMat.emissive.set(0xffffff); faceMat.emissiveIntensity = 0.55;
+      faceMat.color.set(0xffffff); faceMat.needsUpdate = true;
     }, undefined, function () {});
 
     function eyeLocal(u, v) { return { x: (u - 0.5) * 2 * Rdisc, y: (v - 0.5) * 2 * Rdisc }; }
