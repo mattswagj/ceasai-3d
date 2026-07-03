@@ -739,7 +739,7 @@ body.paused .marquee-track{animation-play-state:paused}
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.12;
+    renderer.toneMappingExposure = 0.96;
 
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 60);
@@ -815,14 +815,14 @@ body.paused .marquee-track{animation-play-state:paused}
       return geo;
     }
 
-    var goldMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 1.0, roughness: 0.26, emissive: 0x3a2a08, emissiveIntensity: 0.28 });
-    var silverMat = new THREE.MeshStandardMaterial({ color: 0xD7D3D0, metalness: 1.0, roughness: 0.32, emissive: 0x0a0a0c, emissiveIntensity: 0.05 });
+    var goldMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 1.0, roughness: 0.26, emissive: 0x3a2a08, emissiveIntensity: 0.28, envMapIntensity: 0.5 });
+    var silverMat = new THREE.MeshStandardMaterial({ color: 0xD7D3D0, metalness: 1.0, roughness: 0.32, emissive: 0x0a0a0c, emissiveIntensity: 0.05, envMapIntensity: 0.55 });
 
     var hexOuter = new THREE.Mesh(hexRingGeo(1.62, 1.34, 0.16), goldMat);
     var hexInner = new THREE.Mesh(hexRingGeo(1.30, 1.10, 0.13), silverMat);
     badge.add(hexOuter); badge.add(hexInner);
 
-    var studMat = new THREE.MeshStandardMaterial({ color: 0xF2D680, metalness: 1.0, roughness: 0.3, emissive: 0x6b4a10, emissiveIntensity: 0.4 });
+    var studMat = new THREE.MeshStandardMaterial({ color: 0xF2D680, metalness: 1.0, roughness: 0.3, emissive: 0x6b4a10, emissiveIntensity: 0.4, envMapIntensity: 0.65 });
     for (var sIdx = 0; sIdx < 6; sIdx++) {
       var sa = Math.PI / 2 + sIdx * Math.PI / 3;
       var stud = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 16), studMat);
@@ -831,12 +831,12 @@ body.paused .marquee-track{animation-play-state:paused}
     }
 
     var Rdisc = 0.94;
-    var faceMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 0.12, roughness: 0.62, emissive: 0x161616, emissiveIntensity: 0.2, transparent: true });
+    var faceMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 0.12, roughness: 0.62, emissive: 0x161616, emissiveIntensity: 0.2, envMapIntensity: 0.12, transparent: true });
     var faceDisc = new THREE.Mesh(new THREE.CircleGeometry(Rdisc, 64), faceMat);
     faceDisc.position.z = 0.10; badge.add(faceDisc);
     var bezel = new THREE.Mesh(new THREE.TorusGeometry(Rdisc + 0.02, 0.05, 16, 80), silverMat);
     bezel.position.z = 0.10; badge.add(bezel);
-    var backing = new THREE.Mesh(new THREE.CircleGeometry(Rdisc + 0.06, 64), new THREE.MeshStandardMaterial({ color: 0x0d0e12, metalness: 0.4, roughness: 0.7 }));
+    var backing = new THREE.Mesh(new THREE.CircleGeometry(Rdisc + 0.06, 64), new THREE.MeshStandardMaterial({ color: 0x0d0e12, metalness: 0.4, roughness: 0.7, envMapIntensity: 0.3 }));
     backing.position.z = 0.06; badge.add(backing);
 
     var texLoader = new THREE.TextureLoader();
