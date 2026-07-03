@@ -161,9 +161,9 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
 .hero-stage{position:relative;height:100vh;height:100svh;display:flex;align-items:center;justify-content:center;overflow:hidden}
 #gl{position:fixed;inset:0;z-index:3;width:100%;height:100%;pointer-events:none}
 .hero-fallback{position:fixed;inset:0;z-index:3;pointer-events:none;display:none;
-  background:radial-gradient(circle at 50% 44%, rgba(201,162,39,.2), transparent 30%),radial-gradient(circle at 50% 44%, rgba(201,162,39,.06), transparent 52%)}
+  background:radial-gradient(circle at 50% 47%, rgba(201,162,39,.2), transparent 30%),radial-gradient(circle at 50% 47%, rgba(201,162,39,.06), transparent 52%)}
 .hero-fallback.is-on{display:block}
-.hero-fallback img{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:min(46vw,360px);opacity:.96;filter:drop-shadow(0 20px 60px rgba(0,0,0,.6))}
+.hero-fallback img{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);width:min(46vw,360px);opacity:.96;filter:drop-shadow(0 20px 60px rgba(0,0,0,.6))}
 .hero-copy{position:relative;width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;padding:clamp(92px,13vh,140px) 24px clamp(74px,11vh,116px)}
 .hero-top,.hero-bottom{width:100%;max-width:1180px;position:relative}
 /* Type <-> 3D depth: headline layer sits behind the emblem canvas (z3); sub/CTA in front */
@@ -171,7 +171,7 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
 .hero-bottom{z-index:5}
 .hero-top::before{content:"";position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);width:min(120vw,1000px);height:60vh;pointer-events:none;z-index:-1;background:radial-gradient(ellipse 60% 55% at 50% 50%, rgba(5,5,6,.72), transparent 70%)}
 .hero-bottom::before{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(120vw,820px);height:44vh;pointer-events:none;z-index:-1;background:radial-gradient(ellipse 60% 60% at 50% 55%, rgba(5,5,6,.68), transparent 72%)}
-.hero-glow{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%);z-index:0;pointer-events:none;width:min(96vw,900px);height:min(96vw,900px);border-radius:50%;
+.hero-glow{position:fixed;left:50%;top:47%;transform:translate(-50%,-50%);z-index:0;pointer-events:none;width:min(96vw,900px);height:min(96vw,900px);border-radius:50%;
   background:radial-gradient(circle, rgba(201,162,39,.16), rgba(201,162,39,.05) 42%, transparent 66%);
   filter:blur(8px);opacity:.7;will-change:opacity,transform}
 .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;color:var(--gold);margin-bottom:26px;display:flex;align-items:center;justify-content:center;gap:16px}
@@ -742,7 +742,7 @@ body.paused .marquee-track{animation-play-state:paused}
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.96;
+    renderer.toneMappingExposure = 1.03;
 
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 60);
@@ -758,7 +758,7 @@ body.paused .marquee-track{animation-play-state:paused}
           new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity), side: THREE.DoubleSide }));
         m.position.copy(pos); m.lookAt(0, 0, 0); envScene.add(m);
       };
-      mkPanel(0xfff2cf, 6, 6, 3, new THREE.Vector3(4, 5, 4));
+      mkPanel(0xffe9b8, 6, 6, 3, new THREE.Vector3(4, 5, 4));
       mkPanel(0xf5c451, 3, 4, 8, new THREE.Vector3(-6, 0, 2));
       mkPanel(0x9aa0a6, 2.0, 6, 5, new THREE.Vector3(5, -1, 3));
       mkPanel(0x35405c, 1.4, 8, 3, new THREE.Vector3(0, -6, -4));
@@ -788,13 +788,13 @@ body.paused .marquee-track{animation-play-state:paused}
     } catch (e) {}
 
     scene.add(new THREE.AmbientLight(0x20180a, 1.1));
-    var key = new THREE.DirectionalLight(0xffe3b0, 2.4); key.position.set(2.5, 5, 5); scene.add(key);
+    var key = new THREE.DirectionalLight(0xffd9a4, 2.55); key.position.set(2.5, 5, 5); scene.add(key);
     var rim = new THREE.DirectionalLight(0x5a6a8a, 0.8); rim.position.set(-5, -2, -4); scene.add(rim);
-    var eyeLight = new THREE.PointLight(0x22b7ff, 0.0, 8, 2); eyeLight.position.set(0, 0.1, 0.8); scene.add(eyeLight);
+    var eyeLight = new THREE.PointLight(0x22b7ff, 0.0, 8, 2); eyeLight.position.set(0, -0.12, 0.8); scene.add(eyeLight);
     // Scroll-reactive gold rim light (DRIP-style PointLight glow tied to scroll position)
     var scrollLight = new THREE.PointLight(0xF2D680, 0.6, 14, 2); scrollLight.position.set(0, 2.4, 2.2); scene.add(scrollLight);
 
-    var root = new THREE.Group(); root.scale.setScalar(isMobile ? 0.62 : 0.68); scene.add(root);
+    var root = new THREE.Group(); root.scale.setScalar(isMobile ? 0.62 : 0.68); root.position.y = isMobile ? -0.3 : -0.22; scene.add(root);
     var badge = new THREE.Group(); root.add(badge);
 
     function hexRingGeo(outerR, innerR, depth) {
@@ -818,7 +818,7 @@ body.paused .marquee-track{animation-play-state:paused}
       return geo;
     }
 
-    var goldMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 1.0, roughness: 0.26, emissive: 0x3a2a08, emissiveIntensity: 0.28, envMapIntensity: 0.5 });
+    var goldMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 1.0, roughness: 0.26, emissive: 0x4a3106, emissiveIntensity: 0.33, envMapIntensity: 0.5 });
     var silverMat = new THREE.MeshStandardMaterial({ color: 0xD7D3D0, metalness: 1.0, roughness: 0.32, emissive: 0x0a0a0c, emissiveIntensity: 0.05, envMapIntensity: 0.55 });
 
     var hexOuter = new THREE.Mesh(hexRingGeo(1.62, 1.34, 0.16), goldMat);
@@ -852,7 +852,7 @@ body.paused .marquee-track{animation-play-state:paused}
 
     function eyeLocal(u, v) { return { x: (u - 0.5) * 2 * Rdisc, y: (v - 0.5) * 2 * Rdisc }; }
     var eL = eyeLocal(0.324, 0.534), eR = eyeLocal(0.68, 0.534);
-    var eyeMat = new THREE.MeshBasicMaterial({ color: 0xBFF0FF });
+    var eyeMat = new THREE.MeshBasicMaterial({ color: 0xBFF0FF }); eyeMat.toneMapped = false;
     var eyeGeo = new THREE.CircleGeometry(0.078, 32);
     var eyeLm = new THREE.Mesh(eyeGeo, eyeMat), eyeRm = new THREE.Mesh(eyeGeo, eyeMat);
     eyeLm.position.set(eL.x, eL.y, 0.135); eyeRm.position.set(eR.x, eR.y, 0.135);
@@ -865,7 +865,7 @@ body.paused .marquee-track{animation-play-state:paused}
       return new THREE.CanvasTexture(c);
     })();
     function mkEyeGlow(x, y) {
-      var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: eyeGlowTex, color: 0xffffff, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.9 }));
+      var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: eyeGlowTex, color: 0xffffff, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.9, toneMapped: false }));
       s.scale.set(0.5, 0.5, 1); s.position.set(x, y, 0.16); badge.add(s); return s;
     }
     var glowL = mkEyeGlow(eL.x, eL.y), glowR = mkEyeGlow(eR.x, eR.y);
@@ -904,7 +904,7 @@ body.paused .marquee-track{animation-play-state:paused}
       try {
         composer = new THREE.EffectComposer(renderer);
         composer.addPass(new THREE.RenderPass(scene, camera));
-        bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.85, 0.5, 0.82);
+        bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.85, 0.5, 0.84);
         composer.addPass(bloomPass);
         composer.setPixelRatio(DPR); composer.setSize(window.innerWidth, window.innerHeight);
       } catch (e) { composer = null; bloomPass = null; }
@@ -985,7 +985,7 @@ body.paused .marquee-track{animation-play-state:paused}
 
       if (animate) {
         dragVel *= 0.94; dragAngle += dragVel;
-        badge.rotation.y = t * 0.14 + dragAngle + p * 1.4 + mx * 0.12;
+        badge.rotation.y = t * 0.14 + dragAngle + p * 0.9 + mx * 0.12;
         badge.rotation.x = Math.sin(t * 0.1) * 0.05 + p * 0.2 + my * 0.09;
         ring1.rotation.z = t * 0.1; ring2.rotation.z = -t * 0.07;
         dust.rotation.y = t * 0.012;
@@ -997,14 +997,14 @@ body.paused .marquee-track{animation-play-state:paused}
       mx += (tmx - mx) * 0.045; my += (tmy - my) * 0.045;
       // Cinematic scroll arc: azimuth sweep + gentle elevation + dolly. partE is 0 at both ends,
       // so the camera returns to a clean front view before the hero unpins (fully scrub-reversible).
-      var camR = baseCamZ - p * 2.0 + partE * 0.4;
-      var camAz = partE * 0.85 + mx * 0.1;
-      var camEl = partE * 0.26 - my * 0.06;
+      var camR = baseCamZ - p * 1.0 + partE * 0.3;
+      var camAz = partE * 0.5 + mx * 0.1;
+      var camEl = partE * 0.16 - my * 0.06;
       camera.position.x = Math.sin(camAz) * Math.cos(camEl) * camR + mx * 0.2;
       camera.position.y = Math.sin(camEl) * camR * 0.6 - my * 0.16;
       camera.position.z = Math.cos(camAz) * Math.cos(camEl) * camR;
       camera.lookAt(0, 0, 0);
-      camera.rotation.z += partE * 0.05;
+      camera.rotation.z += partE * 0.03;
 
       if (composer) composer.render(); else renderer.render(scene, camera);
       if (window.__ceasBoot && !window.__ceasBoot.scene) window.__ceasBoot.scene = true;
@@ -1057,7 +1057,7 @@ body.paused .marquee-track{animation-play-state:paused}
   if (motionOK && hasST) {
     var heroTL = gsap.timeline({
       scrollTrigger: {
-        trigger: '#heroWrap', start: 'top top', end: '+=230%', scrub: 0.9,
+        trigger: '#heroWrap', start: 'top top', end: '+=160%', scrub: 0.7,
         pin: '#heroStage', anticipatePin: 1,
         onUpdate: function (self) { heroP.v = self.progress; },
         onLeave: function () { canvasVisible = false; glCanvas.style.visibility = 'hidden'; fallbackEl.style.visibility = 'hidden'; },
@@ -1065,16 +1065,16 @@ body.paused .marquee-track{animation-play-state:paused}
       }
     });
     heroTL
-      .to('.hero-top, .hero-bottom', { opacity: 0, y: -80, scale: 0.96, ease: 'power2.in', duration: 0.3 }, 0)
-      .to('#scrollHint', { opacity: 0, duration: 0.12 }, 0)
-      .fromTo('#heroMid', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.18, ease: 'power2.out' }, 0.36)
-      .to('#heroMid', { opacity: 0, y: -50, duration: 0.16, ease: 'power2.in' }, 0.68)
-      .to('#gl, #heroFallback', { opacity: 0, duration: 0.16, ease: 'none' }, 0.86);
+      .to('.hero-top, .hero-bottom', { opacity: 0, y: -70, scale: 0.97, ease: 'power3.in', duration: 0.28 }, 0)
+      .to('#scrollHint', { opacity: 0, duration: 0.1 }, 0)
+      .fromTo('#heroMid', { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.2, ease: 'power3.out' }, 0.32)
+      .to('#heroMid', { opacity: 0, y: -44, duration: 0.18, ease: 'power3.in' }, 0.7)
+      .to('#gl, #heroFallback', { opacity: 0, duration: 0.11, ease: 'none' }, 0.89);
 
     ScrollTrigger.create({ start: 60, onUpdate: function (self) { document.getElementById('nav').classList.toggle('is-scrolled', self.scroll() > 60); } });
 
     gsap.utils.toArray('[data-reveal]').forEach(function (el) {
-      gsap.from(el, { y: 42, opacity: 0, filter: 'blur(8px)', duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+      gsap.from(el, { y: 42, opacity: 0, filter: 'blur(8px)', duration: 1.2, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
     });
     gsap.utils.toArray('[data-split]').forEach(function (el) {
       var words = el.querySelectorAll('.wi'); if (!words.length) return;
@@ -1082,13 +1082,13 @@ body.paused .marquee-track{animation-play-state:paused}
       gsap.fromTo(el, { clipPath: 'inset(-6% 102% -10% -4%)' }, { clipPath: 'inset(-6% -4% -10% -4%)', duration: 1.05, ease: 'power3.inOut', clearProps: 'clipPath', scrollTrigger: { trigger: el, start: 'top 85%' } });
     });
     gsap.utils.toArray('[data-row]').forEach(function (row, i) {
-      gsap.from(row, { y: 52, opacity: 0, duration: 1.0, ease: 'power3.out', delay: (i % 4) * 0.06, scrollTrigger: { trigger: row, start: 'top 90%' } });
+      gsap.from(row, { y: 52, opacity: 0, duration: 1.1, ease: 'power4.out', delay: (i % 4) * 0.06, scrollTrigger: { trigger: row, start: 'top 90%' } });
     });
 
     gsap.fromTo('#stackViewport', { scale: 0.82 }, { scale: 1.12, ease: 'none', scrollTrigger: { trigger: '#stack', start: 'top bottom', end: 'bottom top', scrub: 1 } });
     gsap.to('.protiq-halo', { y: 130, ease: 'none', scrollTrigger: { trigger: '.protiq-panel', start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
     gsap.fromTo('.proof-quote', { y: 60 }, { y: -60, ease: 'none', scrollTrigger: { trigger: '.proof', start: 'top bottom', end: 'bottom top', scrub: 1.4 } });
-    gsap.from('.contact h2', { scale: 0.94, opacity: 0.4, duration: 1.4, ease: 'power3.out', scrollTrigger: { trigger: '.contact', start: 'top 75%' } });
+    gsap.from('.contact h2', { scale: 0.94, opacity: 0.4, duration: 1.5, ease: 'power4.out', scrollTrigger: { trigger: '.contact', start: 'top 75%' } });
     gsap.to('#hexgrid', { yPercent: 12, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 1.5 } });
 
     // Masked section hand-offs: gold hairline draws + a low luminous sweep as each section enters
