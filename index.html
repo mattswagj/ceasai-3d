@@ -10,7 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A0A0B'/%3E%3Cpath d='M32 6 54 19 54 45 32 58 10 45 10 19Z' fill='none' stroke='%23F2D680' stroke-width='3'/%3E%3Ccircle cx='25' cy='32' r='4' fill='%2322B7FF'/%3E%3Ccircle cx='39' cy='32' r='4' fill='%2322B7FF'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&family=Playfair+Display:ital,wght@1,500&family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300;1,500&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    CEASAI — GOLD EMBLEM · DARK PREMIUM
@@ -83,15 +83,21 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
 .cursor-ring.is-drag{width:78px;height:78px;border-style:dashed}
 
 /* ---------- Loader — gold % + decode wordmark → wipe ---------- */
-.loader{position:fixed;inset:0;z-index:300;background:var(--bg-2);display:flex;align-items:center;justify-content:center;transition:opacity .8s var(--ease),visibility .8s}
+.loader{position:fixed;inset:0;z-index:300;background:#05070D;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center;padding:24px;transition:opacity .4s ease,visibility .4s}
 .loader.is-done{opacity:0;visibility:hidden;pointer-events:none}
-.loader-inner{text-align:center;position:relative}
-.loader-word{font-family:var(--disp);font-weight:700;font-size:clamp(2.4rem,7vw,4.4rem);letter-spacing:.04em;color:var(--ink);display:flex;gap:.02em;justify-content:center}
-.loader-word .c{display:inline-block}
-.loader-word .g{color:var(--gold-hi)}
-.loader-underline{height:1px;width:0;margin:22px auto 0;background:linear-gradient(90deg,transparent,var(--gold),transparent);transition:width .2s linear}
-.loader-pct{margin-top:24px;font-family:var(--mono);font-size:12px;letter-spacing:.4em;text-indent:.4em;color:var(--gold);font-variant-numeric:tabular-nums}
-.loader-sub{margin-top:14px;font-family:var(--mono);font-size:9.5px;letter-spacing:.42em;text-indent:.42em;text-transform:uppercase;color:var(--faint)}
+.ld-mark{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;font-size:clamp(3.6rem,9vw,104px);line-height:1;letter-spacing:.01em;color:#fff;opacity:0;transform:translateY(16px);animation:ldRise 1.2s cubic-bezier(.16,1,.3,1) .2s forwards}
+.ld-mark .a{font-style:italic;color:#F5C451}
+.ld-sub{font-family:'Sora',var(--sans);font-weight:400;font-size:10px;letter-spacing:.5em;text-indent:.5em;text-transform:uppercase;color:#988F7C;opacity:0;transform:translateY(14px);animation:ldRise 1.2s cubic-bezier(.16,1,.3,1) .6s forwards}
+.ld-eyes{display:flex;gap:16px;align-items:center;opacity:0;animation:ldFade 1s cubic-bezier(.16,1,.3,1) .7s forwards}
+.ld-eyes i{width:9px;height:9px;border-radius:50%;background:#37C4FF;box-shadow:0 0 8px #37C4FF,0 0 2px #37C4FF;animation:ldBlink 3.4s ease-in-out infinite}
+.ld-eyes i:last-child{animation-delay:.18s}
+.ld-bar{width:200px;height:1px;background:rgba(231,225,212,.12);position:relative;overflow:hidden;opacity:0;transform:translateY(14px);animation:ldRise 1s cubic-bezier(.16,1,.3,1) .8s forwards}
+.ld-bar::after{content:"";position:absolute;inset:0;transform:scaleX(var(--p,0));transform-origin:left;background:linear-gradient(90deg,#8A6A1F,#F5C451);transition:transform .2s linear}
+.ld-pct{font-family:'Sora',var(--sans);font-weight:400;font-size:10px;letter-spacing:.4em;text-indent:.4em;color:#6B6452;font-variant-numeric:tabular-nums}
+.ld-coord{font-family:'Sora',var(--sans);font-weight:400;font-size:9px;letter-spacing:.34em;text-indent:.34em;color:#3C455E}
+@keyframes ldRise{to{opacity:1;transform:none}}
+@keyframes ldFade{to{opacity:1}}
+@keyframes ldBlink{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(.12)}}
 .wipe{position:fixed;inset:0;z-index:299;pointer-events:none;transform:scaleY(0);transform-origin:bottom;
   background:linear-gradient(180deg,#0d0d0e,#050506);}
 
@@ -331,12 +337,12 @@ body.paused .marquee-track{animation-play-state:paused}
 
 <!-- Loader -->
 <div class="loader" id="loader" aria-hidden="true">
-  <div class="loader-inner">
-    <div class="loader-word" id="loaderWord"></div>
-    <div class="loader-underline" id="loaderUnderline"></div>
-    <div class="loader-pct"><span id="pct">0</span>%</div>
-    <div class="loader-sub">Custom AI Solutions · Norcross · Est. 2025</div>
-  </div>
+  <div class="ld-mark">Ceas<span class="a">AI</span></div>
+  <div class="ld-sub">Custom AI Solutions</div>
+  <div class="ld-eyes" aria-hidden="true"><i></i><i></i></div>
+  <div class="ld-bar" id="ldBar"></div>
+  <div class="ld-pct"><span id="ldPct">0</span></div>
+  <div class="ld-coord">33° 53′ N · 84° 12′ W — ATLANTA</div>
 </div>
 <div class="wipe" id="wipe" aria-hidden="true"></div>
 
@@ -572,41 +578,24 @@ body.paused .marquee-track{animation-play-state:paused}
   if (hasST) gsap.registerPlugin(ScrollTrigger);
 
   /* ---------------- LOADER ---------------- */
+  window.__ceasBoot = { scene: false, tex: false };
   var loader = document.getElementById('loader');
-  var pctEl = document.getElementById('pct');
-  var underline = document.getElementById('loaderUnderline');
-  var wordEl = document.getElementById('loaderWord');
+  var pctEl = document.getElementById('ldPct');
+  var barEl = document.getElementById('ldBar');
   var wipe = document.getElementById('wipe');
   var loadDone = false, introPlayed = false;
 
-  var WORD = 'CEASAI';
-  var GLYPHS = 'ABCDEFGHKMNPRSTXZ#%&$/<>*';
-  var letters = [];
-  for (var wl = 0; wl < WORD.length; wl++) {
-    var sp = document.createElement('span');
-    sp.className = 'c' + (wl >= 4 ? ' g' : '');
-    sp.textContent = WORD[wl];
-    wordEl.appendChild(sp);
-    letters.push(sp);
-  }
   function setPct(p) {
     p = Math.max(0, Math.min(100, Math.round(p)));
-    pctEl.textContent = p;
-    underline.style.width = (p * 0.7) + '%';
-    if (!reduceMotion) {
-      var reveal = Math.floor((p / 100) * WORD.length + 0.001);
-      for (var i = 0; i < WORD.length; i++) {
-        if (i < reveal) letters[i].textContent = WORD[i];
-        else if (p > 4) letters[i].textContent = GLYPHS[(Math.random() * GLYPHS.length) | 0];
-      }
-    }
+    if (pctEl) pctEl.textContent = p;
+    if (barEl) barEl.style.setProperty('--p', (p / 100).toFixed(3));
   }
-  function settleWord() { for (var i = 0; i < WORD.length; i++) letters[i].textContent = WORD[i]; }
+  function bootReady() { return window.__ceasBoot.scene && window.__ceasBoot.tex; }
 
   function finishLoader() {
     if (loadDone) return;
     loadDone = true;
-    setPct(100); settleWord();
+    setPct(100);
     if (reduceMotion || !hasGSAP) { loader.classList.add('is-done'); playIntro(); return; }
     gsap.timeline()
       .to(wipe, { scaleY: 1, transformOrigin: 'bottom', duration: 0.5, ease: 'power4.inOut' }, 0)
@@ -616,7 +605,7 @@ body.paused .marquee-track{animation-play-state:paused}
       .add(function () { playIntro(); }, 0.55);
   }
   (function runLoader() {
-    if (reduceMotion) { setPct(100); setTimeout(finishLoader, 200); return; }
+    if (reduceMotion) { setPct(100); setTimeout(finishLoader, 300); return; }
     var start = performance.now();
     var winLoaded = document.readyState === 'complete';
     window.addEventListener('load', function () { winLoaded = true; });
@@ -624,14 +613,15 @@ body.paused .marquee-track{animation-play-state:paused}
     requestAnimationFrame(function tick(now) {
       if (loadDone) return;
       var el = now - start;
-      var target = winLoaded ? 100 : Math.min(90, (el / 1600) * 90);
-      shown += (target - shown) * (winLoaded ? 0.08 : 0.16);
-      if (winLoaded && shown > 99.3) shown = 100;
+      var ready = winLoaded && bootReady();                 // hold until scene + textures are actually up
+      var target = ready ? 100 : Math.min(92, (el / 1700) * 92);
+      shown += (target - shown) * (ready ? 0.1 : 0.14);
+      if (ready && shown > 99.3) shown = 100;
       setPct(shown);
       if (shown >= 100) { finishLoader(); return; }
       requestAnimationFrame(tick);
     });
-    setTimeout(finishLoader, 4600);
+    setTimeout(finishLoader, 6500);                         // safety: never hang
   })();
 
   /* ---------------- SMOOTH SCROLL ---------------- */
@@ -724,6 +714,7 @@ body.paused .marquee-track{animation-play-state:paused}
     if (gl) gl.style.display = 'none';
     document.getElementById('heroFallback').classList.add('is-on');
     badgeAssemble.v = 1;
+    if (window.__ceasBoot) { window.__ceasBoot.scene = true; window.__ceasBoot.tex = true; }
   }
 
   function initHero() {
@@ -844,8 +835,8 @@ body.paused .marquee-track{animation-play-state:paused}
       tex.encoding = THREE.sRGBEncoding;
       tex.minFilter = THREE.LinearFilter; tex.magFilter = THREE.LinearFilter; tex.generateMipmaps = false;
       faceMat.map = tex; faceMat.emissiveMap = tex; faceMat.emissive.set(0xffffff); faceMat.emissiveIntensity = 0.55;
-      faceMat.color.set(0xffffff); faceMat.needsUpdate = true;
-    }, undefined, function () {});
+      faceMat.color.set(0xffffff); faceMat.needsUpdate = true; if (window.__ceasBoot) window.__ceasBoot.tex = true;
+    }, undefined, function () { if (window.__ceasBoot) window.__ceasBoot.tex = true; });
 
     function eyeLocal(u, v) { return { x: (u - 0.5) * 2 * Rdisc, y: (v - 0.5) * 2 * Rdisc }; }
     var eL = eyeLocal(0.324, 0.534), eR = eyeLocal(0.68, 0.534);
@@ -998,6 +989,7 @@ body.paused .marquee-track{animation-play-state:paused}
       camera.lookAt(0, 0, 0);
 
       if (composer) composer.render(); else renderer.render(scene, camera);
+      if (window.__ceasBoot && !window.__ceasBoot.scene) window.__ceasBoot.scene = true;
 
       frames++; fpsT += dt;
       if (fpsT >= 0.5 && fpsEl) { fpsEl.textContent = Math.round(frames / fpsT) + ' FPS'; frames = 0; fpsT = 0; }
