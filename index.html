@@ -81,6 +81,7 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
 .cursor-ring{width:34px;height:34px;border:1px solid rgba(242,214,128,.5);transition:width .35s var(--ease),height .35s var(--ease),border-color .35s,background .35s}
 .cursor-ring.is-active{width:62px;height:62px;border-color:rgba(242,214,128,.9);background:rgba(242,214,128,.05)}
 .cursor-ring.is-drag{width:78px;height:78px;border-style:dashed}
+.cursor-ring.is-down{width:22px;height:22px;border-color:var(--gold-hi);background:rgba(242,214,128,.12)}
 
 /* ---------- Loader — gold % + decode wordmark → wipe ---------- */
 .loader{position:fixed;inset:0;z-index:300;background:#05070D;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center;padding:24px;transition:opacity .4s ease,visibility .4s}
@@ -305,14 +306,20 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
 .footer-bar{border-top:1px solid var(--line-soft);padding:28px clamp(20px,5vw,72px);display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
 .footer-bar .gold-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);vertical-align:middle;margin:0 10px 2px;box-shadow:0 0 8px rgba(201,162,39,.7)}
 
-/* ---------- Section transitions: gold hairline draw + luminous sweep ---------- */
-.page .section{--wipe:0;--sx:130%}
+/* ---------- Section transitions: masked gold curtain wipe + hairline draw ---------- */
+.page .section{--wipe:0;--sx:0%}
 .page .section::before{content:"";position:absolute;top:0;left:clamp(20px,5vw,72px);right:clamp(20px,5vw,72px);height:1px;
-  background:linear-gradient(90deg,var(--gold),rgba(201,162,39,.25) 55%,transparent);
-  transform:scaleX(var(--wipe));transform-origin:left;opacity:.4;pointer-events:none}
-.page .section::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(105deg,transparent 40%,rgba(242,214,128,.05) 50%,transparent 60%);
-  background-size:220% 100%;background-position:var(--sx) 0;background-repeat:no-repeat}
+  background:linear-gradient(90deg,var(--gold-hi),rgba(201,162,39,.3) 55%,transparent);
+  transform:scaleX(var(--wipe));transform-origin:left;opacity:.55;pointer-events:none}
+/* Masked wipe (spec 4.5): a near-black curtain with a gold leading edge sweeps off
+   left-to-right as the section enters. --sx:0% = fully revealed, so it is statically
+   invisible with no JS; the sweep is scrubbed to scroll and fully reversible. */
+.page .section::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:linear-gradient(102deg,
+    rgba(5,5,6,0) 0%,rgba(5,5,6,0) 42%,
+    rgba(201,162,39,.16) 45.5%,rgba(242,214,128,.5) 48%,rgba(138,106,31,.34) 50%,
+    rgba(7,7,8,.94) 54%,rgba(7,7,8,.94) 100%);
+  background-size:300% 100%;background-position:var(--sx) 0;background-repeat:no-repeat}
 
 /* content visible without JS */
 [data-reveal],[data-split],.build-row,.fact{opacity:1;transform:none}
@@ -691,7 +698,7 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
   })();
 
   /* ---------------- THREE.JS — CEASAI GOLD EMBLEM ---------------- */
-  var heroP = { v: 0 };
+  var heroP = { v: 0, t: 0 };
   var renderOn = true, canvasVisible = true;
   var dragVel = 0, dragAngle = 0;
   var badgeAssemble = { v: 0 };
@@ -717,7 +724,7 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.03;
+    renderer.toneMappingExposure = 1.08;
 
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 60);
@@ -735,7 +742,7 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
       };
       mkPanel(0xffe9b8, 6, 6, 3, new THREE.Vector3(4, 5, 4));
       mkPanel(0xf5c451, 3, 4, 8, new THREE.Vector3(-6, 0, 2));
-      mkPanel(0x9aa0a6, 2.0, 6, 5, new THREE.Vector3(5, -1, 3));
+      mkPanel(0xb8a58a, 2.0, 6, 5, new THREE.Vector3(5, -1, 3));
       mkPanel(0x35405c, 1.4, 8, 3, new THREE.Vector3(0, -6, -4));
       mkPanel(0xffffff, 2.2, 2, 2, new THREE.Vector3(0, 2, -7));
       var envRT = pmrem.fromScene(envScene, 0.04);
@@ -763,7 +770,7 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
     } catch (e) {}
 
     scene.add(new THREE.AmbientLight(0x20180a, 1.1));
-    var key = new THREE.DirectionalLight(0xffd9a4, 2.55); key.position.set(2.5, 5, 5); scene.add(key);
+    var key = new THREE.DirectionalLight(0xffd292, 2.7); key.position.set(2.5, 5, 5); scene.add(key);
     var rim = new THREE.DirectionalLight(0x5a6a8a, 0.8); rim.position.set(-5, -2, -4); scene.add(rim);
     var eyeLight = new THREE.PointLight(0x22b7ff, 0.0, 8, 2); eyeLight.position.set(0, -0.12, 0.8); scene.add(eyeLight);
     // Scroll-reactive gold rim light (DRIP-style PointLight glow tied to scroll position)
@@ -793,14 +800,14 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
       return geo;
     }
 
-    var goldMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 1.0, roughness: 0.26, emissive: 0x4a3106, emissiveIntensity: 0.33, envMapIntensity: 0.5 });
+    var goldMat = new THREE.MeshStandardMaterial({ color: 0xC9A227, metalness: 1.0, roughness: 0.26, emissive: 0x553708, emissiveIntensity: 0.37, envMapIntensity: 0.56 });
     var silverMat = new THREE.MeshStandardMaterial({ color: 0xD7D3D0, metalness: 1.0, roughness: 0.32, emissive: 0x0a0a0c, emissiveIntensity: 0.05, envMapIntensity: 0.55 });
 
     var hexOuter = new THREE.Mesh(hexRingGeo(1.62, 1.34, 0.16), goldMat);
     var hexInner = new THREE.Mesh(hexRingGeo(1.30, 1.10, 0.13), silverMat);
     badge.add(hexOuter); badge.add(hexInner);
 
-    var studMat = new THREE.MeshStandardMaterial({ color: 0xF2D680, metalness: 1.0, roughness: 0.3, emissive: 0x6b4a10, emissiveIntensity: 0.4, envMapIntensity: 0.65 });
+    var studMat = new THREE.MeshStandardMaterial({ color: 0xF2D680, metalness: 1.0, roughness: 0.3, emissive: 0x6b4a10, emissiveIntensity: 0.46, envMapIntensity: 0.65 });
     for (var sIdx = 0; sIdx < 6; sIdx++) {
       var sa = Math.PI / 2 + sIdx * Math.PI / 3;
       var stud = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 16), studMat);
@@ -927,6 +934,10 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
       var asmE = asm * asm * (3 - 2 * asm);
       badge.scale.setScalar(0.6 + asmE * 0.4);
 
+      // Fling-proof: heroP.v eases toward the raw scroll target so a hard fling
+      // can never snap the camera; converges in ~0.35s, exact at rest (reversible).
+      heroP.v += (heroP.t - heroP.v) * Math.min(1, dt * 8);
+      if (Math.abs(heroP.t - heroP.v) < 0.0005) heroP.v = heroP.t;
       var p = heroP.v;
       var partE = Math.sin(Math.min(Math.max(p, 0), 1) * Math.PI);
       partE = partE * partE * (3 - 2 * partE);
@@ -972,14 +983,14 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
       mx += (tmx - mx) * 0.045; my += (tmy - my) * 0.045;
       // Cinematic scroll arc: azimuth sweep + gentle elevation + dolly. partE is 0 at both ends,
       // so the camera returns to a clean front view before the hero unpins (fully scrub-reversible).
-      var camR = baseCamZ - p * 1.0 + partE * 0.3;
-      var camAz = partE * 0.5 + mx * 0.1;
-      var camEl = partE * 0.16 - my * 0.06;
+      var camR = baseCamZ - p * 0.8 + partE * 0.24;
+      var camAz = partE * 0.34 + mx * 0.09;
+      var camEl = partE * 0.11 - my * 0.05;
       camera.position.x = Math.sin(camAz) * Math.cos(camEl) * camR + mx * 0.2;
       camera.position.y = Math.sin(camEl) * camR * 0.6 - my * 0.16;
       camera.position.z = Math.cos(camAz) * Math.cos(camEl) * camR;
       camera.lookAt(0, 0, 0);
-      camera.rotation.z += partE * 0.03;
+      camera.rotation.z += partE * 0.018;
 
       if (composer) composer.render(); else renderer.render(scene, camera);
       if (window.__ceasBoot && !window.__ceasBoot.scene) window.__ceasBoot.scene = true;
@@ -1034,17 +1045,26 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
       scrollTrigger: {
         trigger: '#heroWrap', start: 'top top', end: '+=160%', scrub: 0.7,
         pin: '#heroStage', anticipatePin: 1,
-        onUpdate: function (self) { heroP.v = self.progress; },
-        onLeave: function () { canvasVisible = false; glCanvas.style.visibility = 'hidden'; fallbackEl.style.visibility = 'hidden'; },
-        onEnterBack: function () { canvasVisible = true; glCanvas.style.visibility = 'visible'; fallbackEl.style.visibility = 'visible'; }
+        onUpdate: function (self) { heroP.t = self.progress; }
       }
     });
     heroTL
       .to('.hero-top, .hero-bottom', { opacity: 0, y: -70, scale: 0.97, ease: 'power3.in', duration: 0.28 }, 0)
       .to('#scrollHint', { opacity: 0, duration: 0.1 }, 0)
       .fromTo('#heroMid', { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.2, ease: 'power3.out' }, 0.32)
-      .to('#heroMid', { opacity: 0, y: -44, duration: 0.18, ease: 'power3.in' }, 0.7)
-      .to('#gl, #heroFallback', { opacity: 0, duration: 0.11, ease: 'none' }, 0.89);
+      .to('#heroMid', { opacity: 0, y: -44, duration: 0.18, ease: 'power3.in' }, 0.72);
+
+    // Gap-free hand-off: the fixed canvas stays live behind the page through the unpin
+    // and only fades out as Approach rises to 30% of the viewport — even a hard fling
+    // never lands on an empty black beat between the hero and the first section.
+    gsap.fromTo('#gl, #heroFallback', { opacity: 1 }, {
+      opacity: 0, ease: 'none',
+      scrollTrigger: {
+        trigger: '#approach', start: 'top 96%', end: 'top 30%', scrub: true,
+        onLeave: function () { canvasVisible = false; glCanvas.style.visibility = 'hidden'; fallbackEl.style.visibility = 'hidden'; },
+        onEnterBack: function () { canvasVisible = true; glCanvas.style.visibility = 'visible'; fallbackEl.style.visibility = 'visible'; }
+      }
+    });
 
     ScrollTrigger.create({ start: 60, onUpdate: function (self) { document.getElementById('nav').classList.toggle('is-scrolled', self.scroll() > 60); } });
 
@@ -1053,7 +1073,7 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
     });
     gsap.utils.toArray('[data-split]').forEach(function (el) {
       var words = el.querySelectorAll('.wi'); if (!words.length) return;
-      gsap.from(words, { yPercent: 118, duration: 1.1, stagger: 0.04, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%' } });
+      gsap.from(words, { yPercent: 118, duration: 1.15, stagger: 0.045, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%' } });
       gsap.fromTo(el, { clipPath: 'inset(-6% 102% -10% -4%)' }, { clipPath: 'inset(-6% -4% -10% -4%)', duration: 1.05, ease: 'power3.inOut', clearProps: 'clipPath', scrollTrigger: { trigger: el, start: 'top 85%' } });
     });
     gsap.utils.toArray('[data-row]').forEach(function (row, i) {
@@ -1066,10 +1086,11 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
     gsap.from('.contact h2', { scale: 0.94, opacity: 0.4, duration: 1.5, ease: 'power4.out', scrollTrigger: { trigger: '.contact', start: 'top 75%' } });
     gsap.to('#hexgrid', { yPercent: 12, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 1.5 } });
 
-    // Masked section hand-offs: gold hairline draws + a low luminous sweep as each section enters
+    // Masked gold-wipe hand-offs (spec 4.5): the near-black curtain with a gold leading
+    // edge sweeps off each section on entry — one continuous scene, no hard cuts.
     gsap.utils.toArray('.page .section').forEach(function (sec) {
       gsap.fromTo(sec, { '--wipe': 0 }, { '--wipe': 1, ease: 'none', scrollTrigger: { trigger: sec, start: 'top 92%', end: 'top 45%', scrub: true } });
-      gsap.fromTo(sec, { '--sx': '130%' }, { '--sx': '-30%', ease: 'none', scrollTrigger: { trigger: sec, start: 'top 96%', end: 'top 22%', scrub: true } });
+      gsap.fromTo(sec, { '--sx': '100%' }, { '--sx': '0%', ease: 'none', scrollTrigger: { trigger: sec, start: 'top 97%', end: 'top 42%', scrub: true } });
     });
 
 
@@ -1100,6 +1121,8 @@ body.cursor-on .cursor-dot,body.cursor-on .cursor-ring{display:block}
     var dot = document.getElementById('cDot'), ring = document.getElementById('cRing');
     var cx = -100, cy = -100, rx = -100, ry = -100;
     window.addEventListener('mousemove', function (e) { cx = e.clientX; cy = e.clientY; }, { passive: true });
+    window.addEventListener('pointerdown', function () { ring.classList.add('is-down'); }, { passive: true });
+    window.addEventListener('pointerup', function () { ring.classList.remove('is-down'); }, { passive: true });
     (function cursorLoop() {
       rx += (cx - rx) * 0.15; ry += (cy - ry) * 0.15;
       dot.style.transform = 'translate(' + cx + 'px,' + cy + 'px) translate(-50%,-50%)';
